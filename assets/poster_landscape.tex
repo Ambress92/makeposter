@@ -1,0 +1,128 @@
+% Conference poster, 140 x 90 cm landscape (NeurIPS main-conference size), makeposter house style.
+% Every coordinate is in centimetres on the printed sheet, with the origin at the bottom left.
+% Three columns (39, 56 and 39 cm) over a full-width row of plots; reading order is left column,
+% middle, right column, then the plots.
+% Build:  python3 ~/.claude/skills/makeposter/scripts/poster.py build     (or: pdflatex poster.tex)
+% Keep box coordinates as plain numbers: poster.py reads them to crop, measure and proofread.
+\documentclass[tikz,border=0pt]{standalone}
+\usepackage{posterstyle}
+\newcommand{\PW}{140}\newcommand{\PH}{90}   % page size in cm
+
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\useasboundingbox (0,0) rectangle (\PW,\PH);
+\fill[white] (0,0) rectangle (\PW,\PH);
+
+% =================================== HEADER ===================================================
+\posterband{25}{78.4}{117}{88.6}{5.5}
+  {Short Name of the Method}
+  {The Rest of the Paper Title, Set as the Subtitle}
+  {First Author, Second Author, Third Author, and Last Author}
+% left: venue logo over institution logo (vector files; a placeholder is drawn while a file is missing)
+\node[inner sep=0pt] at (13,85.5) {\posterimg{20cm}{5.6cm}{logos/venue_logo.pdf}};
+\node[inner sep=0pt] at (13,80.2) {\posterimg{20cm}{2.4cm}{logos/institution_logo.pdf}};
+% right: QR codes, top edge level with the band
+\posterqr{123.3}{88.6}{7.6cm}{https://arxiv.org/abs/0000.00000}{Paper}
+\posterqr{133.4}{88.6}{7.6cm}{https://github.com/user/repository}{Code}
+
+% =================================== LEFT COLUMN ==============================================
+\pbox{1.5}{58.85}{40.5}{77.0}{The Problem, in a Noun Phrase}{%
+Two sentences that state the problem for a visitor from another area.
+Say what current methods need and where that breaks.\par
+\vspace{0.6cm}
+{\centering\posterimg{30cm}{5.2cm}{figures/problem_sketch.pdf}\par}
+\vspace{0.6cm}
+One sentence that lists the consequences, in the words the paper uses.
+}
+
+\pbox{1.5}{30.5}{40.5}{56.95}{Formal Setting}{%
+\hl{Definition (Name).} One sentence that says what is measured, then
+\[
+\phi(r)=1-|\tau(r,a)|,\qquad \tau(r,a)=\frac{N_{+}(r)-N_{-}(r)}{\binom{n}{2}},
+\]
+where every symbol is explained in words, with the \hl{new terms} in bold once.\par
+\vspace{0.3cm}
+\hl{Definition (Second name).} The second quantity that the problem needs,
+\[
+d(r_0,r)=\sum_{(i,j)\ \text{inverted}} w_{ij},
+\]
+with its terms named here, because later boxes and plots reuse exactly these names.\par
+\vspace{0.3cm}
+\hl{Problem.} Given a threshold $\psi\in[0,1]$, find
+\[
+\min_{r}\; d(r_0,r)\quad\text{subject to}\quad \phi(r)\ge\psi .
+\]
+}
+
+% =================================== MIDDLE COLUMN ============================================
+\pbox{42}{30.5}{98}{77.0}{Our Solution: Method Name (ACRONYM)}{%
+Two sentences with the one idea behind the method, the \hl{key term} in bold.
+Say what a single step changes, in the quantities defined on the left.\par
+\vspace{1.4cm}
+\noindent\begin{posteralg}[0.57\linewidth]{Method Name (ACRONYM)}
+1: & $r\gets r_0$\\
+2: & \textbf{while} $\phi(r)<\psi$ and a step can raise $\phi(r)$ \textbf{do}\\
+3: & \quad apply the cheapest such step\\
+4: & \textbf{return} $r$
+\end{posteralg}\hfill
+\begin{minipage}[c]{0.39\linewidth}
+\raggedright
+Two sentences next to the algorithm: the data structure behind line 3 and what one step costs.
+\end{minipage}\par
+\vspace{1.9cm}
+{\centering\posterimg{\linewidth}{22.3cm}{figures/fig_example.pdf}\par}
+\vspace{1.4cm}
+{\fCaption Two lines that say how to read the example (what the colours mean) and give its outcome in
+numbers that a visitor can check against the figure.\par}
+}
+
+% =================================== RIGHT COLUMN =============================================
+\pbox{99.5}{52.9}{138.5}{77.0}{The Main Result in Four Words}{%
+\hl{Definition (Name).} The one extra quantity the theorem needs, with its formula:
+\[
+\Delta(r)=|N_{+}(r)-N_{-}(r)| .
+\]\par
+\vspace{0.6cm}
+\hl{Theorem.} The statement as a single sentence that ends in
+\[
+K^{\ast}=\left\lceil\frac{\Delta_0-\Delta^{\ast}}{2}\right\rceil\ \ \text{steps, at distance}\ \
+d(r_0,r_{\mathrm{out}})=\frac{K^{\ast}}{\binom{n}{2}}.
+\]\par
+\vspace{0.6cm}
+\hl{Proof idea.} One sentence for the lower bound that every solution obeys.
+One sentence for why the method attains it.
+}
+
+\pbox{99.5}{30.5}{138.5}{51.0}{Guarantees and Runtime}{%
+\noindent\begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}ll@{}}
+\toprule
+\textbf{Setting} & \textbf{Guarantee} & \textbf{Time}\\
+\midrule
+first & optimal & $O(n\log n+K^{\ast})$\\[0.25cm]
+second & $c$-approximation & $O((n+K^{\ast})\log n)$\\
+\bottomrule
+\end{tabular*}\par
+\vspace{0.3cm}
+{\fCaption One line under the table for what both rows share and for symbols not yet defined.\par}
+\vspace{0.6cm}
+Two sentences for results that do not fit a table cell: a special case with its exact setting,
+and any conjecture in the paper's own words.
+}
+
+% =================================== BOTTOM ROW ===============================================
+% Titles hang from y=27.2, the plots stand on y=6.9 and the captions start at y=5.8.
+% Give the plots one common height, so that their x-axes sit on one line.
+\pframe{1.5}{1.4}{138.5}{29.0}
+\ppanelsetup{27.2}{6.9}{5.8}
+\ppanel{34.5}{59}{The main empirical claim, as a full sentence}
+  {\posterimg{60cm}{17.9cm}{figures/fig_main_poster.pdf}}
+  {The first sentence says what each mark is. The second says how to read the plot,
+   for example which direction is better.}
+\ppanel{82}{29}{A second claim that a plot supports}
+  {\posterimg{29cm}{17.15cm}{figures/fig_second_poster.pdf}}
+  {The first sentence gives the setting of the plot. The second gives the reason behind what it shows.}
+\ppanel{117}{36}{The method scales to large inputs}
+  {\posterimg{36.9cm}{17.15cm}{figures/fig_runtime_poster.pdf}}
+  {One sentence with the headline number. One sentence on the hardest case.}
+\end{tikzpicture}
+\end{document}

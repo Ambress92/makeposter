@@ -1,0 +1,122 @@
+% posterstyle.sty: house style for conference posters built with the makeposter skill.
+% Gradient title band with two rounded corners, white boxes with thick rounded blue borders,
+% Helvetica text with Latin Modern math, vector QR codes. All sizes are absolute: the poster is
+% drawn at its print size in one tikzpicture whose unit is 1 cm.
+%
+% Use:  \documentclass[tikz,border=0pt]{standalone}
+%       \usepackage{posterstyle}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{posterstyle}[2026/11/24 makeposter house style]
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{lmodern}
+% lmodern loads the math extension font (sums, big delimiters, fraction rules) at a fixed 10pt,
+% which gives tiny sum signs in 33pt text. Let it scale with the text size.
+\DeclareFontFamily{OMX}{lmex}{}
+\DeclareFontShape{OMX}{lmex}{m}{n}{<->lmex10}{}
+\RequirePackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{graphicx}
+\RequirePackage{qrcode}
+\RequirePackage{booktabs}
+\RequirePackage{tikz}
+\usetikzlibrary{calc,arrows.meta}
+
+% ---- palette ---------------------------------------------------------------------------------
+\definecolor{bandtop}{HTML}{3075ED}
+\definecolor{bandbot}{HTML}{113E8B}
+\definecolor{boxblue}{HTML}{1155CC}
+\definecolor{navy}{HTML}{101968}
+\definecolor{softgrey}{HTML}{555555}
+
+% ---- type scale (absolute sizes, printed 1:1) --------------------------------------------------
+% The sizes below are tuned for columns about 39 cm wide (140 x 90 cm landscape with three
+% columns, A0 portrait with two). For narrower columns set \posterfontscale below 1.
+\newcommand{\posterfontscale}{1}
+% \fsz{size}{leading}: TikZ nodes with a text width set \spaceskip from the 10pt font, which
+% leaves 3pt word spaces in large text. Reset it after every font change.
+\newcommand{\fsz}[2]{\fontsize{\fpeval{#1*\posterfontscale}}{\fpeval{#2*\posterfontscale}}%
+  \selectfont\spaceskip=0pt\xspaceskip=0pt\relax}
+\newcommand{\fTitle}{\fsz{110}{120}}
+\newcommand{\fSub}{\fsz{54}{64}}
+\newcommand{\fAuthors}{\fsz{40}{48}}
+\newcommand{\fBoxTitle}{\fsz{46}{54}\bfseries\color{navy}}
+\newcommand{\fPanelTitle}{\fsz{36}{44}\bfseries\color{navy}}
+\newcommand{\fBody}{\fsz{33}{43}}
+\newcommand{\fCaption}{\fsz{28}{36}}
+\newcommand{\fQR}{\fsz{30}{36}}
+
+\newcommand{\hl}[1]{\textbf{#1}}
+\newcommand{\pitem}{\par\hangindent=1.1em\hangafter=1\noindent\makebox[1.1em][l]{\textbullet}}
+
+% Posters are read from a distance: no hyphenation.
+\AtBeginDocument{\hyphenpenalty=10000\exhyphenpenalty=10000}
+
+% Tables: rules as heavy as the rest of the poster.
+\setlength{\heavyrulewidth}{3pt}
+\setlength{\lightrulewidth}{1.5pt}
+\setlength{\aboverulesep}{0.3cm}
+\setlength{\belowrulesep}{0.4cm}
+
+% ---- boxes -------------------------------------------------------------------------------------
+\newcommand{\posterboxradius}{2.6cm}
+\newcommand{\posterboxline}{0.3cm}
+% \pframe{x0}{y0}{x1}{y1}: rounded frame only (for example around a row of plots).
+\newcommand{\pframe}[4]{%
+  \draw[boxblue,line width=\posterboxline,rounded corners=\posterboxradius,fill=white] (#1,#2) rectangle (#3,#4);}
+% \pbox{x0}{y0}{x1}{y1}{title}{content}: rounded box, centred title, content below it.
+% The content is the text of one TikZ node. End every paragraph with \par, and give every node
+% of a nested tikzpicture its own anchor: nested nodes inherit anchor=north and inner sep=0pt.
+\newcommand{\pbox}[6]{%
+  \pframe{#1}{#2}{#3}{#4}%
+  \pgfmathsetlengthmacro{\tw}{(#3-#1-3.4)*1cm}%
+  \node[anchor=north,text width=\tw,inner sep=0pt] at ({(#1+#3)/2},{#4-1.35})
+    {{\centering\fBoxTitle #5\par}\vspace{0.75cm}{\raggedright\fBody #6\par}};}
+
+% ---- header ------------------------------------------------------------------------------------
+% \posterband{x0}{y0}{x1}{y1}{radius}{title}{subtitle}{authors}: gradient band with rounded
+% top-left and bottom-right corners and the three centred lines of the title block.
+\newcommand{\posterband}[8]{%
+  \shade[top color=bandtop,bottom color=bandbot]
+    (#1,#2) -- (#1,{#4-#5}) arc[start angle=180,end angle=90,radius=#5] -- (#3,#4)
+    -- (#3,{#2+#5}) arc[start angle=0,end angle=-90,radius=#5] -- cycle;
+  \node[text=white,align=center,inner sep=0pt] at ({(#1+#3)/2},{(#2+#4)/2})
+    {{\fTitle #6}\\[0.55cm]{\fSub #7}\\[0.75cm]{\fAuthors #8}};}
+
+% \posterimg{width}{height}{file}: the image scaled to fit the given size, or a labelled
+% placeholder of that size while the file does not exist (logos, plots still to be made).
+\newcommand{\posterimg}[3]{%
+  \IfFileExists{#3}{\includegraphics[width=#1,height=#2,keepaspectratio]{#3}}{%
+    \begin{tikzpicture}
+      \useasboundingbox (0,0) rectangle (#1,#2);
+      \draw[black!35,dashed,line width=2pt,fill=black!4] ($(0,0)+(1pt,1pt)$) rectangle ($(#1,#2)-(1pt,1pt)$);
+      \node[anchor=center,inner sep=0pt,font=\fsz{20}{24},text=black!55] at ($(0,0)!0.5!(#1,#2)$) {\detokenize{#3}};
+    \end{tikzpicture}}}
+
+% \posterqr{x}{ytop}{size}{url}{label}: vector QR code with a bold label under it.
+\newcommand{\posterqr}[5]{%
+  \node[inner sep=0pt,anchor=north] at (#1,#2) {\qrcode[height=#3]{#4}};
+  \node[font=\fQR,text=navy,anchor=base,inner sep=0pt] at ($(#1,#2)+(0,-#3)+(0,-1.8cm)$) {\textbf{#5}};}
+
+% ---- row of plots ------------------------------------------------------------------------------
+% Set the three heights once per row, then place each panel by its centre and width (in cm).
+% Titles hang from one line, the figures stand on one line (so that their x-axes align when the
+% figures have the same height), and the captions start on one line.
+\newcommand{\ppanelsetup}[3]{\def\ppaneltitleY{#1}\def\ppanelfigY{#2}\def\ppanelcapY{#3}}
+\ppanelsetup{27.2}{6.9}{5.8}
+% \ppanel{xcentre}{width}{title}{figure}{caption}
+\newcommand{\ppanel}[5]{%
+  \node[anchor=north,inner sep=0pt,text width=#2cm] at (#1,\ppaneltitleY) {\centering\fPanelTitle #3\par};
+  \node[anchor=south,inner sep=0pt] at (#1,\ppanelfigY) {#4};
+  \node[anchor=north,inner sep=0pt,text width=#2cm] at (#1,\ppanelcapY) {\raggedright\fCaption\strut #5\par};}
+
+% ---- algorithm ---------------------------------------------------------------------------------
+% \begin{posteralg}[width]{Name} 1: & line\\ 2: & line \end{posteralg}
+\newenvironment{posteralg}[2][\linewidth]{%
+  \begin{minipage}[c]{#1}\rule{\linewidth}{3pt}\\[-0.1cm]
+  \textbf{Algorithm}\enspace #2\\[-0.35cm]
+  \rule{\linewidth}{1.5pt}\\[-0.2cm]
+  \begin{tabular}{@{}r@{\hspace{0.7em}}l@{}}}
+  {\end{tabular}\\[-0.25cm]\rule{\linewidth}{3pt}\end{minipage}}
+\endinput

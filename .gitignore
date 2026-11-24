@@ -1,0 +1,12 @@
+# the user's own logos stay on the machine
+logos-private/
+# previews and build files
+preview/
+assets/*.pdf
+assets/figures/
+*.aux
+*.log
+*.out
+*.synctex.gz
+__pycache__/
+.DS_Store

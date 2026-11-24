@@ -1,0 +1,113 @@
+% Conference poster, A0 portrait (84.1 x 118.9 cm), makeposter house style.
+% Every coordinate is in centimetres on the printed sheet, with the origin at the bottom left.
+% Two columns of 39.8 cm, the same width as the side columns of the landscape template, so the
+% type scale is unchanged. Rows from the top: title band, problem | formal setting, method
+% (full width), main result | guarantees, plots, then a footer with logos and QR codes.
+% Build:  python3 ~/.claude/skills/makeposter/scripts/poster.py build     (or: pdflatex poster.tex)
+% Keep box coordinates as plain numbers: poster.py reads them to crop, measure and proofread.
+\documentclass[tikz,border=0pt]{standalone}
+\usepackage{posterstyle}
+\newcommand{\PW}{84.1}\newcommand{\PH}{118.9}   % page size in cm
+
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\useasboundingbox (0,0) rectangle (\PW,\PH);
+\fill[white] (0,0) rectangle (\PW,\PH);
+
+% =================================== HEADER ===================================================
+\posterband{1.5}{106.3}{82.6}{117.4}{5.5}
+  {Short Name of the Method}
+  {The Rest of the Paper Title, Set as the Subtitle}
+  {First Author, Second Author, Third Author, and Last Author}
+
+% =================================== ROW 1: PROBLEM | FORMAL SETTING ==========================
+\pbox{1.5}{83.8}{41.3}{104.8}{The Problem, in a Noun Phrase}{%
+Two sentences that state the problem for a visitor from another area.
+Say what current methods need and where that breaks.\par
+\vspace{0.6cm}
+{\centering\posterimg{30cm}{6.4cm}{figures/problem_sketch.pdf}\par}
+\vspace{0.6cm}
+One sentence that lists the consequences, in the words the paper uses.
+}
+
+\pbox{42.8}{83.8}{82.6}{104.8}{Formal Setting}{%
+\hl{Definition (Name).} One sentence that says what is measured, then
+\[
+\phi(r)=1-|\tau(r,a)|,\qquad \tau(r,a)=\frac{N_{+}(r)-N_{-}(r)}{\binom{n}{2}},
+\]
+where every symbol is explained in words, with the \hl{new terms} in bold once.\par
+\vspace{0.3cm}
+\hl{Problem.} Given a threshold $\psi\in[0,1]$, find
+\[
+\min_{r}\; d(r_0,r)\quad\text{subject to}\quad \phi(r)\ge\psi .
+\]
+}
+
+% =================================== ROW 2: METHOD ============================================
+\pbox{1.5}{56.3}{82.6}{82.3}{Our Solution: Method Name (ACRONYM)}{%
+\noindent\begin{minipage}[t]{0.40\linewidth}\vspace{0pt}\raggedright
+Two sentences with the one idea behind the method, the \hl{key term} in bold.
+Say what a single step changes, in the quantities defined above.\par
+\vspace{0.9cm}
+\begin{posteralg}{Method Name (ACRONYM)}
+1: & $r\gets r_0$\\
+2: & \textbf{while} $\phi(r)<\psi$ \textbf{do}\\
+3: & \quad apply the cheapest step\\
+4: & \textbf{return} $r$
+\end{posteralg}\par
+\vspace{0.9cm}
+Two sentences on the data structure behind line 3 and on what one step costs.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.57\linewidth}\vspace{0pt}
+{\centering\posterimg{\linewidth}{15.6cm}{figures/fig_example.pdf}\par}
+\vspace{0.7cm}
+{\raggedright\fCaption Two lines that say how to read the example and give its outcome in numbers
+that a visitor can check against the figure.\par}
+\end{minipage}\par
+}
+
+% =================================== ROW 3: MAIN RESULT | GUARANTEES ==========================
+\pbox{1.5}{35.3}{41.3}{54.8}{The Main Result in Four Words}{%
+\hl{Theorem.} The statement as a single sentence that ends in
+\[
+K^{\ast}=\left\lceil\frac{\Delta_0-\Delta^{\ast}}{2}\right\rceil\ \ \text{steps, at distance}\ \
+d(r_0,r_{\mathrm{out}})=\frac{K^{\ast}}{\binom{n}{2}}.
+\]\par
+\vspace{0.6cm}
+\hl{Proof idea.} One sentence for the lower bound that every solution obeys.
+One sentence for why the method attains it.
+}
+
+\pbox{42.8}{35.3}{82.6}{54.8}{Guarantees and Runtime}{%
+\noindent\begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}ll@{}}
+\toprule
+\textbf{Setting} & \textbf{Guarantee} & \textbf{Time}\\
+\midrule
+first & optimal & $O(n\log n+K^{\ast})$\\[0.25cm]
+second & $c$-approximation & $O((n+K^{\ast})\log n)$\\
+\bottomrule
+\end{tabular*}\par
+\vspace{0.3cm}
+{\fCaption One line for what both rows share and for symbols not yet defined.\par}
+\vspace{0.6cm}
+Two sentences for results that do not fit a table cell.
+}
+
+% =================================== ROW 4: PLOTS =============================================
+% Titles hang from y=32.0, the plots stand on y=17.0 and the captions start at y=15.9.
+\pframe{1.5}{11.8}{82.6}{33.8}
+\ppanelsetup{32.0}{17.0}{15.9}
+\ppanel{22.2}{37}{The main empirical claim, as a sentence}
+  {\posterimg{37cm}{12.4cm}{figures/fig_main_poster.pdf}}
+  {The first sentence says what each mark is. The second says how to read the plot.}
+\ppanel{61.9}{37}{The method scales to large inputs}
+  {\posterimg{37cm}{12.4cm}{figures/fig_runtime_poster.pdf}}
+  {One sentence with the headline number. One sentence on the hardest case.}
+
+% =================================== FOOTER ===================================================
+\node[inner sep=0pt] at (12.5,6.2) {\posterimg{20cm}{5.6cm}{logos/venue_logo.pdf}};
+\node[inner sep=0pt] at (38,6.2) {\posterimg{24cm}{2.9cm}{logos/institution_logo.pdf}};
+\posterqr{68.2}{10.3}{6.4cm}{https://arxiv.org/abs/0000.00000}{Paper}
+\posterqr{78.0}{10.3}{6.4cm}{https://github.com/user/repository}{Code}
+\end{tikzpicture}
+\end{document}
